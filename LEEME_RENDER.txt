@@ -1,0 +1,17 @@
+
+COPIAR ESTE CONTENIDO SOBRE:
+C:\Users\johnn\Desktop\QUIZMASTER\QUIZMASTER_APP
+
+Reemplazar:
+backend\src\server.js
+
+Agregar:
+render.yaml
+
+Luego ejecutar:
+
+git add .
+git commit -m "Preparar QuizMaster para Render"
+git push
+
+NO se modifica backend\.env.
