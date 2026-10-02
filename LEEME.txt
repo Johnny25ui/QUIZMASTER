@@ -1,0 +1,62 @@
+
+QUIZMASTER - CORRECCIÓN DE REVISIÓN + LIMPIEZA DE PRUEBAS
+===========================================================
+
+1. COPIAR SOBRE QUIZMASTER_APP
+------------------------------
+Copie y reemplace:
+
+frontend\src\main.jsx
+
+Agregue:
+
+backend\scripts\limpiar-pruebas.js
+LIMPIAR_PRUEBAS.ps1
+
+2. CORREGIR "REVISAR RESPUESTAS"
+---------------------------------
+La ruta correcta queda registrada:
+
+/admin/results/:id
+
+Después de copiar los archivos:
+Ctrl + C
+.\INICIAR_QUIZMASTER.ps1
+
+Entre nuevamente:
+http://localhost:5173/admin
+
+Luego:
+Panel > Revisar respuestas
+
+Ya no debe enviarlo al inicio.
+
+3. ELIMINAR LAS PRUEBAS ANTES DE PUBLICAR
+-----------------------------------------
+Desde PowerShell:
+
+cd "C:\Users\johnn\Desktop\QUIZMASTER\QUIZMASTER_APP"
+
+.\LIMPIAR_PRUEBAS.ps1
+
+El script pedirá escribir:
+
+LIMPIAR
+
+Elimina SOLO:
+- student_responses
+- attempts
+- students
+
+CONSERVA:
+- cuestionarios
+- preguntas
+- respuestas correctas
+- administrador
+- configuración
+
+4. RECOMENDACIÓN
+----------------
+Primero pruebe que "Revisar respuestas" funcione.
+Después ejecute LIMPIAR_PRUEBAS.ps1.
+Finalmente haga el despliegue a GitHub/Render.
