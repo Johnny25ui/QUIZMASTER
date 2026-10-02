@@ -26,6 +26,7 @@ router.get("/results",async(_req,res)=>{
     SELECT
       a.id,
       a.questionnaire_id,
+      a.student_id,
       s.full_name,
       s.email,
       s.student_code,
@@ -53,39 +54,11 @@ router.get("/results",async(_req,res)=>{
   res.json(r.rows);
 });
 
-router.get("/rankings/:questionnaireId",async(req,res)=>{
-  const r=await pool.query(`
-    SELECT
-      ROW_NUMBER() OVER(
-        ORDER BY a.score DESC,
-                 a.time_spent ASC NULLS LAST,
-                 a.completed_at ASC
-      )::int AS position,
-      a.id AS attempt_id,
-      s.full_name,
-      s.email,
-      s.student_code,
-      a.score,
-      a.max_score,
-      a.percentage,
-      a.correct_answers,
-      a.incorrect_answers,
-      a.time_spent,
-      a.completed_at
-    FROM quizmaster.attempts a
-    JOIN quizmaster.students s ON s.id=a.student_id
-    WHERE a.questionnaire_id=$1
-      AND a.completed_at IS NOT NULL
-    ORDER BY position
-  `,[Number(req.params.questionnaireId)]);
-  res.json(r.rows);
-});
-
 router.get("/results/:id",async(req,res)=>{
   const attemptId=Number(req.params.id);
 
   const summary=await pool.query(`
-    SELECT a.id,a.questionnaire_id,s.full_name,s.email,s.student_code,q.title,
+    SELECT a.id,a.questionnaire_id,a.student_id,s.full_name,s.email,s.student_code,q.title,
            a.score,a.max_score,a.percentage,a.correct_answers,a.incorrect_answers,
            a.time_spent,a.started_at,a.completed_at
     FROM quizmaster.attempts a
@@ -128,6 +101,80 @@ router.get("/results/:id",async(req,res)=>{
     position:rank.rows[0]?.position||null,
     responses:detail.rows
   });
+});
+
+/* Elimina un intento y sus respuestas. Si el estudiante queda sin intentos,
+   también elimina el registro del estudiante. */
+router.delete("/results/:id", async (req,res)=>{
+  const attemptId=Number(req.params.id);
+  const client=await pool.connect();
+
+  try{
+    await client.query("BEGIN");
+
+    const found=await client.query(
+      "SELECT student_id FROM quizmaster.attempts WHERE id=$1 FOR UPDATE",
+      [attemptId]
+    );
+
+    if(!found.rowCount){
+      await client.query("ROLLBACK");
+      return res.status(404).json({error:"Resultado no encontrado."});
+    }
+
+    const studentId=found.rows[0].student_id;
+
+    await client.query(
+      "DELETE FROM quizmaster.student_responses WHERE attempt_id=$1",
+      [attemptId]
+    );
+
+    await client.query(
+      "DELETE FROM quizmaster.attempts WHERE id=$1",
+      [attemptId]
+    );
+
+    const remaining=await client.query(
+      "SELECT COUNT(*)::int AS total FROM quizmaster.attempts WHERE student_id=$1",
+      [studentId]
+    );
+
+    if(remaining.rows[0].total===0){
+      await client.query(
+        "DELETE FROM quizmaster.students WHERE id=$1",
+        [studentId]
+      );
+    }
+
+    await client.query("COMMIT");
+    res.json({ok:true,message:"Resultado eliminado correctamente."});
+  }catch(e){
+    await client.query("ROLLBACK");
+    throw e;
+  }finally{
+    client.release();
+  }
+});
+
+/* Limpia todos los estudiantes, intentos y respuestas.
+   NO toca cuestionarios, preguntas ni administrador. */
+router.delete("/results", async (_req,res)=>{
+  const client=await pool.connect();
+
+  try{
+    await client.query("BEGIN");
+    await client.query("DELETE FROM quizmaster.student_responses");
+    await client.query("DELETE FROM quizmaster.attempts");
+    await client.query("DELETE FROM quizmaster.students");
+    await client.query("COMMIT");
+
+    res.json({ok:true,message:"Todos los resultados fueron eliminados."});
+  }catch(e){
+    await client.query("ROLLBACK");
+    throw e;
+  }finally{
+    client.release();
+  }
 });
 
 export default router;

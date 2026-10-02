@@ -1,0 +1,45 @@
+
+/* BOTONES ADMINISTRATIVOS DE ELIMINACIÓN */
+.adminActions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.dangerBtn,
+.dangerSmallBtn{
+  border:1px solid #7a3042;
+  background:#3a1720;
+  color:#ffdce3;
+  border-radius:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.dangerBtn{
+  padding:12px 18px;
+}
+
+.dangerSmallBtn{
+  padding:10px 13px;
+}
+
+.dangerBtn:hover,
+.dangerSmallBtn:hover{
+  background:#54202d;
+}
+
+.dangerBtn:disabled,
+.dangerSmallBtn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.successAlert{
+  padding:13px 15px;
+  border-radius:12px;
+  background:#123629;
+  border:1px solid #286248;
+  color:#bff7dc;
+  margin:12px 0;
+}

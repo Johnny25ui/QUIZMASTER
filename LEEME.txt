@@ -1,62 +1,41 @@
 
-QUIZMASTER - CORRECCIÓN DE REVISIÓN + LIMPIEZA DE PRUEBAS
-===========================================================
+QUIZMASTER - ELIMINAR RESULTADOS DESDE LA WEB
+==============================================
 
-1. COPIAR SOBRE QUIZMASTER_APP
-------------------------------
-Copie y reemplace:
+COPIAR SOBRE:
+C:\Users\johnn\Desktop\QUIZMASTER\QUIZMASTER_APP
 
-frontend\src\main.jsx
+REEMPLAZAR:
+backend\src\routes\admin.js
+frontend\src\pages\AdminDashboard.jsx
 
-Agregue:
+PEGAR AL FINAL DE:
+frontend\src\styles.css
 
-backend\scripts\limpiar-pruebas.js
-LIMPIAR_PRUEBAS.ps1
+el contenido de:
+frontend\styles_patch.txt
 
-2. CORREGIR "REVISAR RESPUESTAS"
----------------------------------
-La ruta correcta queda registrada:
+DESPUÉS SUBIR:
+git add .
+git commit -m "Agregar eliminacion de resultados desde administrador"
+git push
 
-/admin/results/:id
+Render hará Auto-Deploy.
 
-Después de copiar los archivos:
-Ctrl + C
-.\INICIAR_QUIZMASTER.ps1
-
-Entre nuevamente:
-http://localhost:5173/admin
-
-Luego:
-Panel > Revisar respuestas
-
-Ya no debe enviarlo al inicio.
-
-3. ELIMINAR LAS PRUEBAS ANTES DE PUBLICAR
------------------------------------------
-Desde PowerShell:
-
-cd "C:\Users\johnn\Desktop\QUIZMASTER\QUIZMASTER_APP"
-
-.\LIMPIAR_PRUEBAS.ps1
-
-El script pedirá escribir:
-
-LIMPIAR
-
-Elimina SOLO:
-- student_responses
-- attempts
-- students
-
-CONSERVA:
-- cuestionarios
-- preguntas
-- respuestas correctas
-- administrador
-- configuración
-
-4. RECOMENDACIÓN
+NUEVAS FUNCIONES
 ----------------
-Primero pruebe que "Revisar respuestas" funcione.
-Después ejecute LIMPIAR_PRUEBAS.ps1.
-Finalmente haga el despliegue a GitHub/Render.
+1. Botón "Eliminar" junto a cada estudiante:
+   - elimina ese intento;
+   - elimina sus respuestas;
+   - si no tiene otros intentos, elimina también al estudiante.
+
+2. Botón "Limpiar todos":
+   - elimina todos los estudiantes;
+   - elimina todos los intentos;
+   - elimina todas las respuestas.
+
+NO ELIMINA:
+- cuestionarios;
+- preguntas;
+- respuestas correctas;
+- administrador.
